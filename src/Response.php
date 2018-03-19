@@ -32,8 +32,13 @@ class Response
         return $this->content;
     }
 
-    public function getResponseJson()
+    public function getResponseArray()
     {
         return json_decode($this->content, true);
+    }
+
+    public function getResponseObject()
+    {
+        return json_decode($this->content);
     }
 }
