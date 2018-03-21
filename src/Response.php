@@ -3,42 +3,42 @@
 namespace Singiu\Http;
 class Response
 {
-    private $status_code;
-    private $content;
-    private $url;
+    private $_statusCode;
+    private $_content;
+    private $_url;
 
     public function __construct($ch)
     {
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $this->content = curl_exec($ch);
-        $this->status_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $this->url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        $this->_content = curl_exec($ch);
+        $this->_statusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $this->_url = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
         curl_close($ch);
     }
 
     public function getUrl()
     {
-        return $this->url;
+        return $this->_url;
     }
 
     public function getStatusCode()
     {
-        return $this->status_code;
+        return $this->_statusCode;
     }
 
     public function getResponseText()
     {
-        return $this->content;
+        return $this->_content;
     }
 
     public function getResponseArray()
     {
-        return json_decode($this->content, true);
+        return json_decode($this->_content, true);
     }
 
     public function getResponseObject()
     {
-        return json_decode($this->content);
+        return json_decode($this->_content);
     }
 }
