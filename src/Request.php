@@ -199,6 +199,10 @@ class Request
         } else if (in_array($method, $allow_methods)) {
             curl_setopt($this->_curl, CURLOPT_POST, false);
             curl_setopt($this->_curl, CURLOPT_CUSTOMREQUEST, $method);
+            // 解决 HEAD 请求超时问题。
+            if ($method == 'HEAD') {
+                curl_setopt($this->_curl, CURLOPT_NOBODY, true);
+            }
         }
     }
 
@@ -227,7 +231,7 @@ class Request
             switch ($key) {
                 case 'timeout':
                     if (is_int($item)) {
-                        curl_setopt($curl, CURLOPT_TIMEOUT, $item);
+                        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, $item);
                     }
                     break;
                 case 'headers':
