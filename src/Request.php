@@ -214,8 +214,14 @@ class Request
     private function setUrl($url)
     {
         // 如果 $url 以 http(s):// 开头，则无视 baseUrl。
-        if (!preg_match('/^https?:\/\//', $url) && $this->_baseUrl != null && $this->_baseUrl != '')
+        if (!preg_match('#^https?://#', $url) && $this->_baseUrl != null && $this->_baseUrl != '') {
             $url = rtrim(trim($this->_baseUrl), '/') . '/' . ltrim(trim($url), '/');
+        }
+        if (preg_match('#^https://#', $url)) {
+            curl_setopt($this->_curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, false);
+        }
         curl_setopt($this->_curl, CURLOPT_URL, $url);
     }
 
@@ -227,6 +233,7 @@ class Request
      */
     private function setOptions(&$curl, $options)
     {
+        $header = [];
         foreach ($options as $key => $item) {
             switch ($key) {
                 case 'timeout':
@@ -236,7 +243,6 @@ class Request
                     break;
                 case 'headers':
                     if (is_array($item)) {
-                        $header = [];
                         foreach ($item as $k => $v) {
                             array_push($header, $k . ': ' . $v);
                         }
@@ -252,7 +258,8 @@ class Request
                     break;
                 case 'data':
                     $fields = is_array($item) ? http_build_query($item) : $item;
-                    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Length: ' . strlen($fields)));
+                    array_push($header, 'Content-Length: ' . strlen($fields));
+                    curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
                     curl_setopt($curl, CURLOPT_POSTFIELDS, $fields);
             }
         }
